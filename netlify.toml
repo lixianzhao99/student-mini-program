@@ -1,0 +1,12 @@
+[build]
+  publish = "dist"
+  command = "pnpm run build"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  NODE_VERSION = "18"
+  PNPM_VERSION = "10.28.1"
