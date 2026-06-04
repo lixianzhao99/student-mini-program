@@ -1,0 +1,61 @@
+{
+  "strategy": {
+    "name": "风格轮动增强策略V2",
+    "lookback_days_short": 10,
+    "lookback_days_mid": 20,
+    "lookback_days_long": 60,
+    "holding_num": 10,
+    "reserve_cash_ratio": 0.02,
+    "rebalance_frequency": "monthly",
+    "max_single_stock_weight": 0.15,
+    "max_single_industry_weight": 0.25,
+    "min_single_industry_weight": 0.05
+  },
+  "indices": {
+    "SHSE.000016": "上证50",
+    "SHSE.000300": "沪深300",
+    "SZSE.399005": "中小板指",
+    "SZSE.399006": "创业板指",
+    "SHSE.000905": "中证500"
+  },
+  "factors": {
+    "momentum_short_weight": 0.15,
+    "momentum_mid_weight": 0.20,
+    "momentum_long_weight": 0.15,
+    "valuation_pe_weight": 0.10,
+    "valuation_pb_weight": 0.10,
+    "valuation_ps_weight": 0.05,
+    "volatility_atr_weight": 0.15,
+    "quality_roe_weight": 0.10
+  },
+  "stop_loss": {
+    "enabled": true,
+    "trailing_stop": true,
+    "initial_stop_pct": 0.08,
+    "trailing_stop_pct": 0.06,
+    "volatility_adjusted": true,
+    "min_stop_pct": 0.05,
+    "max_stop_pct": 0.15
+  },
+  "adaptive": {
+    "market_volatility_threshold": 0.02,
+    "bull_market_threshold": 0.05,
+    "bear_market_threshold": -0.05,
+    "volatile_threshold": 0.03,
+    "momentum_enhance_bull": 1.3,
+    "volatility_enhance_bear": 1.4,
+    "quality_enhance_volatile": 1.2
+  },
+  "rebalance": {
+    "threshold_pct": 0.05,
+    "max_positions": 15,
+    "min_positions": 5
+  },
+  "backtest": {
+    "start_time": "2023-08-01 08:00:00",
+    "end_time": "2025-06-03 16:00:00",
+    "initial_cash": 10000000,
+    "commission_ratio": 0.0001,
+    "slippage_ratio": 0.0001
+  }
+}
