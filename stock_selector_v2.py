@@ -7,6 +7,7 @@ import pandas as pd
 import logging
 import json
 import math
+import os
 from collections import OrderedDict
 
 logging.basicConfig(
@@ -27,20 +28,79 @@ class StockSelectorV2:
     4. 多时点选股支持
     """
 
-    def __init__(self, config_file='stock_selector_v2_config.json'):
+    def __init__(self, config_file=None):
+        """
+        初始化选股器
+        
+        参数:
+            config_file: 配置文件路径（可选）
+                        如果不提供或找不到，使用内置默认配置
+        """
         self.load_config(config_file)
         self.stock_pool = []
         self.stock_analysis = {}
         self.market_environment = 'neutral'
 
-    def load_config(self, config_file):
+    def _find_config_file(self):
+        """自动查找配置文件"""
+        possible_files = [
+            'stock_selector_v2_config.json',
+            './stock_selector_v2_config.json',
+            '../stock_selector_v2_config.json',
+        ]
+        
+        # 获取当前脚本所在目录
         try:
-            with open(config_file, 'r', encoding='utf-8') as f:
-                self.config = json.load(f)
-            logger.info(f'配置加载成功')
-        except Exception as e:
-            logger.error(f'配置加载失败：{e}')
-            self.config = self._get_default_config()
+            script_dir = os.path.dirname(os.path.abspath(__file__))
+            if script_dir:
+                possible_files.append(os.path.join(script_dir, 'stock_selector_v2_config.json'))
+        except:
+            pass
+        
+        # 检查每个可能的路径
+        for file_path in possible_files:
+            if os.path.exists(file_path):
+                logger.info(f'找到配置文件: {file_path}')
+                return file_path
+        
+        return None
+
+    def load_config(self, config_file=None):
+        """加载配置"""
+        # 情况1：用户指定了配置文件
+        if config_file and os.path.exists(config_file):
+            try:
+                with open(config_file, 'r', encoding='utf-8') as f:
+                    self.config = json.load(f)
+                logger.info(f'配置加载成功: {config_file}')
+                self._validate_token()
+                return
+            except Exception as e:
+                logger.warning(f'加载指定配置文件失败: {e}')
+        
+        # 情况2：自动查找配置文件
+        auto_config = self._find_config_file()
+        if auto_config:
+            try:
+                with open(auto_config, 'r', encoding='utf-8') as f:
+                    self.config = json.load(f)
+                logger.info(f'配置加载成功: {auto_config}')
+                self._validate_token()
+                return
+            except Exception as e:
+                logger.warning(f'加载配置文件失败: {e}')
+        
+        # 情况3：使用内置默认配置
+        logger.info('未找到配置文件，使用内置默认配置')
+        self.config = self._get_default_config()
+
+    def _validate_token(self):
+        """验证Token配置"""
+        token = self.config.get('backtest', {}).get('token', '')
+        if token == '{{token}}' or not token or len(token) < 10:
+            logger.warning('⚠️ 注意：Token未配置或可能无效')
+            logger.warning('   在掘金终端中运行时，Token会自动获取')
+            logger.warning('   如果在云端运行，请配置正确的Token')
 
     def _get_default_config(self):
         return {
@@ -871,21 +931,31 @@ if __name__ == '__main__':
     logger.info('=' * 60)
     logger.info('股票池选股器启动 V2.0')
     logger.info(f'执行日期：{now_date}')
+    logger.info('提示：无需配置文件也能运行，使用内置默认配置')
     logger.info('=' * 60)
 
+    # 创建选股器实例（不指定配置文件，会自动查找或使用内置配置）
+    selector = StockSelectorV2()
+
+    # 执行选股
     selected = selector.select_stocks(now_date)
 
     if not selected.empty:
         selector.print_summary()
         filename = selector.export_to_excel()
-        logger.info(f'Excel文件已生成：{filename}')
+        if filename:
+            logger.info(f'Excel文件已生成：{filename}')
     else:
         logger.warning('选股结果为空')
 
     if mode == 'schedule':
+        # 获取当前文件名（支持任意文件名）
+        import __main__
+        current_filename = __main__.__file__ if hasattr(__main__, '__file__') else 'main.py'
+        
         run(
             strategy_id='stock_selector_v2',
-            filename='stock_selector_v2.py',
+            filename=current_filename,
             mode=MODE_LIVE,
             token=selector.config['backtest']['token'],
             schedule_market='SHSE',
