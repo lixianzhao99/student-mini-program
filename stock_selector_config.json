@@ -1,0 +1,31 @@
+{
+  "strategy": {
+    "name": "多因子选股策略",
+    "lookback_days_short": 10,
+    "lookback_days_mid": 20,
+    "lookback_days_long": 60,
+    "holding_num": 20,
+    "min_market_cap": 50,
+    "max_pe": 100,
+    "max_pb": 10
+  },
+  "indices": {
+    "SHSE.000300": "沪深300",
+    "SHSE.000905": "中证500",
+    "SHSE.000016": "上证50"
+  },
+  "factors": {
+    "momentum_short_weight": 0.15,
+    "momentum_mid_weight": 0.20,
+    "momentum_long_weight": 0.10,
+    "valuation_pe_weight": 0.12,
+    "valuation_pb_weight": 0.08,
+    "valuation_ps_weight": 0.05,
+    "volatility_weight": 0.10,
+    "quality_roe_weight": 0.10,
+    "growth_weight": 0.10
+  },
+  "backtest": {
+    "token": "{{token}}"
+  }
+}
