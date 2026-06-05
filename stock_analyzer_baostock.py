@@ -106,8 +106,7 @@ class StockAnalyzer:
                 "date,close,volume",
                 start_date=(pd.to_datetime(date_str) - datetime.timedelta(days=45)).strftime('%Y-%m-%d'),
                 end_date=date_str,
-                frequency="d",
-                adjustprice=1
+                frequency="d"
             )
             
             data_list = []
@@ -186,8 +185,7 @@ class StockAnalyzer:
                 "date,code,open,high,low,close,volume,amount,turn",
                 start_date=(pd.to_datetime(end_date) - datetime.timedelta(days=90)).strftime('%Y-%m-%d'),
                 end_date=end_date,
-                frequency="d",
-                adjustprice=2  # 前复权
+                frequency="d"
             )
             
             data_list = []
